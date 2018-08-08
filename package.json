@@ -22,6 +22,9 @@
   },
   "homepage": "https://github.com/TheoWei/Blockhcain-web3-Practice#readme",
   "dependencies": {
+    "bn.js": "^4.11.8",
+    "elliptic": "^6.4.0",
+    "js-sha3": "^0.8.0",
     "solc": "^0.4.24",
     "web3": "^0.20.7"
   }
