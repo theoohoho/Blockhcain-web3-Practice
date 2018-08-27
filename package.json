@@ -1,8 +1,8 @@
 {
   "name": "blockchain-web3-practice",
   "version": "1.0.0",
-  "description": "dapp practice",
-  "main": "index.js",
+  "description": "��B\u0000l\u0000o\u0000c\u0000k\u0000c\u0000h\u0000a\u0000i\u0000n\u0000-\u0000w\u0000e\u0000b\u00003\u0000-\u0000P\u0000r\u0000a\u0000c\u0000t\u0000i\u0000c\u0000e\u0000\r\u0000 \u0000",
+  "main": "GenerateKey.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -10,23 +10,10 @@
     "type": "git",
     "url": "git+https://github.com/TheoWei/Blockhcain-web3-Practice.git"
   },
-  "keywords": [
-    "blockchain",
-    "web3",
-    "dapp"
-  ],
-  "author": "Theo Wei",
+  "author": "",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/TheoWei/Blockhcain-web3-Practice/issues"
   },
-  "homepage": "https://github.com/TheoWei/Blockhcain-web3-Practice#readme",
-  "dependencies": {
-    "bn.js": "^4.11.8",
-    "elliptic": "^6.4.0",
-    "js-sha3": "^0.8.0",
-    "solc": "^0.4.24",
-    "web3": "^0.20.7",
-    "zeppelin-solidity": "^1.11.0"
-  }
+  "homepage": "https://github.com/TheoWei/Blockhcain-web3-Practice#readme"
 }
