@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/TheoWei/Blockhcain-web3-Practice/issues"
   },
-  "homepage": "https://github.com/TheoWei/Blockhcain-web3-Practice#readme"
+  "homepage": "https://github.com/TheoWei/Blockhcain-web3-Practice#readme",
+  "dependencies": {
+    "web3": "^0.20.7"
+  }
 }
