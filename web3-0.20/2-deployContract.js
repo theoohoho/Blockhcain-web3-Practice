@@ -38,12 +38,20 @@ for(var contractName in compiledContract.contracts){
     var abi = JSON.parse(compiledContract.contracts[contractName].interface);
 }
 
+//gas estimate
+var gasEstimate = web3.eth.estimateGas({ data: '0x' + bytecode });
+console.log('gasEstimate = ' + gasEstimate);
+
+//unlock sender account
+web3.personal.unlockAccount(sender,'password');
+
 //create contract instance 
-var gasEstimate = web3.eth.estimateGas('0x'+bytecode);
 var MyContract = web3.eth.contract(abi);
-var MyContractReturn = MyContract.new({from:sender,data:bytecode,gas:gasEstimate},function(err,myContract){
+var MyContractReturn = MyContract.new({from:sender,data:'0x'+bytecode,gas:gasEstimate},function(err,myContract){
     if(!err){
-        //callback have twice
+        //callback will execute twice
+        //first time is send transaction
+        //second time is transaction been confirmed
         if(!myContract.address){ 
             console.log(myContract.transactionHash);//first callback > deploy contract to network
         }else{

@@ -53,6 +53,7 @@ console.log(nonChangeContractContentFunction);
 //Second Function will change data in contact, so you need add .sendTransaction() 
 //assume this function is like ...function ContractFunction(address _addr,uint _amount) public(){}...
 //after you execute this code will send transaction to contract and return transactionHash
+web3.personal.unlockAccount(senderAddress,'password');
 var TransactionHash = myContractInstance.ContractFunction.sendTransaction(address parameter1, uint parameter2...,{from: senderAddress});
 console.log(TransactionHash);
 
