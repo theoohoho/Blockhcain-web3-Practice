@@ -20,17 +20,30 @@ fs.writeFileSync('./contractABI.json',JSON.stringify(abi));
 //unlock account
 web3.eth.personal.unlockAccount(sender).then(console.log('unlock Account!'));
 
-// deploy contract
-var myContractInstance = new web3.eth.Contract(abi).deploy({
+// estimate gas 
+var estimateGas;
+new web3.eth.Contract(abi).deploy({
     data:bytecode,
-    arguments:[1000] //直接輸入parameter，型別必須相同，所以需要先轉換(這邊設定是uint，所以數字沒問題)
-}).send({
-    from:sender,
-    gasPrice: 20000,
-    gas: 1000000
-},function(err,txHash){
-    console.log(`transaction hash :: ${txHash}`);
-}).then(function(newContractInstance){
-    console.log(`contractAddress:: ${newContractInstance.options.address}`);
-    fs.writeFileSync('./contractAddress.js',newContractInstance.options.address);
+    arguments:[1000] 
+}).estimateGas(function(err,gas){
+    estimateGas = gas;
+}).then(()=>{
+
+    // deploy contract
+    var myContractInstance = new web3.eth.Contract(abi).deploy({
+        data:bytecode,
+        arguments:[1000] //直接輸入parameter，型別必須相同，所以需要先轉換(這邊設定是uint，所以數字沒問題)
+    }).send({
+        from:sender,
+        gasPrice: 20000,
+        gas: estimateGas
+    },function(err,txHash){
+        console.log(`transaction hash :: ${txHash}`);
+    }).then(function(newContractInstance){
+        console.log(`contractAddress:: ${newContractInstance.options.address}`);
+        fs.writeFileSync('./contractAddress.js',newContractInstance.options.address);
+    });
 });
+
+
+

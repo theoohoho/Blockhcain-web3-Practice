@@ -57,13 +57,16 @@ myContractInstance1.deploy({data:bytecode,argument:[parameter]}).send({from:send
 });
 
 
+//estimate gas
+myContractInstance1.deploy({data:bytecode,argument:[parameter]}).estimateGas(function(err,gas){console.log(gas)});
 
 
 var myContractInstance2  = new web3.eth.Contract(abi,contract_address);
 
+// call
 myContractInstance2.methods.methodfunction(param).call();
 
-
+// send
 myContractInstance2.methods.methodfunction(param)
 .send({from: account,value: web3.util.toWei('0.1','ether')})
 .on('transactionHash',function(transactionHash){
