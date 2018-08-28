@@ -21,4 +21,7 @@ contract Token{
         }
         
     }
+    function test(bytes32 _hash) public view returns(bytes32){
+        return _hash;
+    }
 }
