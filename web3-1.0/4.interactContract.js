@@ -24,3 +24,4 @@ if(!test2('12345')){
 }else{
     console.log('get');
 }
+

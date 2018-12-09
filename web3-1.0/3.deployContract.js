@@ -2,7 +2,7 @@ var solc = require('solc');
 var fs = require('fs');
 var Web3 = require('web3');
 var web3 = new Web3('http://localhost:8545'); //ganache default url
-var sender = '0x3a8ed9523252a74c53ddf618271fa4fdcee9bb27'; // ganache random account
+var sender = '0x72c1aca267fbc523ff733a826365da9b81eaeaa0'; // ganache random account
 
 // contract compile 
 var file = fs.readFileSync('./token.sol','utf8');
