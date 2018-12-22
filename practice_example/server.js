@@ -2,12 +2,12 @@
 web3、infura
 
 network information (getCoinbase、isMining、getGasPrice、getBlocknumber、)
-block status (getBlock)
+block status (getBlock、subscribe(pendingTransaction、newBlockHeader))
 address status (getBalance、getTransactionCount)
 tx status (getTransaction、getTransactionReceipt)
 create account 
-send Tx 
-
+send Tx (sendTransaction)
+interact with contract  (web3.eth.Contract、myContract.deploy、myContract.methods.Method1(param...).send())
 
 */
 

@@ -116,4 +116,143 @@ batch.execute();
                 nonce: 設定相同nonce，會覆蓋相同nonce的 pending tx
             }
         ```
-* `web3.eth.sendSignedTransaction`
+    * return event emitter
+        * `transactionHash`
+        * `receipt`
+        * `confirmation`
+        * `error`
+        ```javascript
+            web3.eth.sendTransaction({
+                from: ...,
+                to: ...,
+                value: ...               
+            })
+            .then((receipt)=>{
+                ...
+            })
+            .on('transactionHash',(hash)=>{
+                ...
+            })
+            .on('receipt',(receipt)=>{
+                ...
+            })
+            .on('confirmation',(confirmNum,receipt)=>{
+                ...
+            })
+            .on('error',(err)=>{
+                ...
+            })
+        ```
+
+* `web3.eth.sendSignedTransaction(signedTransactionData [,callback])`
+    * send an already signed transaction 由`web3.eth.account.signTransaction` sign 
+    * `signedTransactionData` is `string` in HEX format 
+* `web3.eth.sign(dataToSign, address [,callback])`
+    * first parameter can be `string` or hex string, cause both valid 
+    * second parameter is an address to sign data 
+    * return `string` signature 
+* `web3.eth.signTransaction(txObject, address [,callback])`
+    * return object (the RLP econded transaction) 
+    * `raw` property use `web3.eth.sendSignedTransaction` to send tx
+* `web3.eth.call(callObject [,defaultBlock] [,callback])`
+    * execute a message call(訊息回傳) transaction ，但是不會被mine進blockchain (也就是說執行不會改變contract內容的 訊息回傳transaction)
+    * `callObject`就是txObject，不過`from` property is optional
+* `web3.eth.estimateGas(callObject [,callback])`
+    * 回傳需要gas used的用量
+    * `callObject`就是txObject，不過`from` property is optional
+* `web3.eth.getPastLogs(option [,callback])`
+    * 透過`option`指定範圍，回傳過去的log
+    * `option` is a filter as sturcutre
+        * `fromBlock`
+        * `toBlock`
+        * `address` can be `string` or `array`, get log from particular account 
+        * `topics` can be `array`
+* `web3.eth.getWork()`
+    * get work for miner to mine on  取得miner的工作內容
+    * return `array` 
+        1. index 0 : current block header pow-hash
+        2. index 1 : seed hash used for DAG
+        3. index 2 : boundary condition 
+* `web3.eth.submitWork(nonce, powHash, digest [,callback])`
+    * 提交 PoW solution
+    * `nonce` is `string` 8 bytes
+    * `powHash` is `string` 32 bytes，header's pow hash
+    * `digest` is `string` 32 bytes，mix digest
+    * return `boolean`
+
+
+## web3.eth.subscribe
+This function is subscribing specific event in the blockchain 只訂閱特定在blockchain中特定的 event
+* `web3.eth.subscribe(type [,options] [,callback])`
+    * `type` is `string` as following item
+        * 'pendingTransactions'
+            * subscribe incoming pending tx, non `options`
+        * 'newBlockHeaders'
+            * subscribe incoming block headers, non `options`
+        * 'syncing'
+            * subscribe syncing events, non `options`
+        * 'logs'
+            subscribe incoming logs, filer by `options`
+    * all type return `data`、`changed`、`error`, except 'pendingTransactions' and 'newBlockHeaders' haven't `changed`
+* `web3.eth.clearSubscriptions()`
+    * reset subscriptions, but not reset from other packages like `web3-shh`
+
+
+## web3.eth.Contract
+main function to interact with smart contract in blockchain. When create contract object, first step is give abi json object of respective smart contract and web3 will convert all calls into low level ABI calls over RPC 
+
+* `new web3.eth.Contract(abiJsonObject [,address][,options])`
+    * create new contract instance 
+    * `address` mean the address of the smart contract that I want to call 
+    * `options` 
+        * `from` addres transaction made from 
+        * `gasPrice`
+        * `gas`
+        * `data` byte code of contract
+    * Method
+        * `clone`
+            * clone the current contract instance 
+        * `deploy(options)`
+            * deploy new contract to blockchain 
+            * `options`
+                * `data` contract bytecode 
+                * `argument` is `array`(optional), the argument pass to constructor on deployment
+            * return tx object 
+                * argument 
+                * `send`
+                * `estimateGas`
+                * `encodeABI`
+        * `methods.methodName([param1,param2...])`
+            * create tx object for that method 可以針對指定的method，來建立一個tx object
+            * declare method:: `methods.methodName([param1,param2...])`、`methods['methodSignature'](param1)`
+            * return tx object as following 呼叫emthods 回傳的tx object包含
+                * argument 
+                * `call([options][,callback])` execute smart contract and call constant method in EVM without sending tx 
+                    * `options` include `from`、`gasPrice`、`gas`
+                * `send(options [,callback])` send tx to smart contract and execute it method 
+                    * `options` include `from`(non-optional)、`gasPrice`、`gas`、`value`(optional)
+                    * return promiEvent `transactionHash`、`receipt`、`confirmation`、`error`
+                * `estimateGas` estimate gas that method execution will take, but the estimation different from actual gas used, cause the state of smart contract can be different at that time 
+                    * `options` include `from`、`gas` as a gasLimit、`value` for call tx 
+                * `encodeABI` enocde abi for this mehtod, can used to send tx, call method, pass to method as argument 
+```javascript
+// initiate 
+var myContract = new web3.eth.Contract(abi);
+
+// clone
+var myContract2 = myContract.clone();
+myContract2.options.address = address2;
+
+// deploy
+myContract.deploy({data: bytecode,argument:[uint256,"string",[array1,array2]]}).send({from: userAddress});
+myContract.deploy({data: bytecode,argument:[uint256,"string",[array1,array2]]}).estimateGas().then((gasAmount)=>{console.log(gasAmount)});
+myContract.deploy({data: bytecode,argument:[uint256,"string",[array1,array2]]}).encodeABI();
+
+myContract.options.data = bytecode;
+myContract.deploy({argument:[uint256,"string",[array1,array2]]});
+
+//methods
+myContract.methods.Method1().call();
+myContract.methods.Method2(param1,param2).send({from: userAddress1});
+```
+
