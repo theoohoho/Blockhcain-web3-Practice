@@ -237,15 +237,15 @@ main function to interact with smart contract in blockchain. When create contrac
                 * `encodeABI` enocde abi for this mehtod, can used to send tx, call method, pass to method as argument 
 ```javascript
 // initiate 
-var myContract = new web3.eth.Contract(abi);
+var myContract = new web3.eth.Contract(abi,address);
 
 // clone
 var myContract2 = myContract.clone();
 myContract2.options.address = address2;
 
 // deploy
-myContract.deploy({data: bytecode,argument:[uint256,"string",[array1,array2]]}).send({from: userAddress});
-myContract.deploy({data: bytecode,argument:[uint256,"string",[array1,array2]]}).estimateGas().then((gasAmount)=>{console.log(gasAmount)});
+myContract.deploy({data: bytecode,argument:[uint256,"string",[array1,array2]]}).send({from: userAddress, gasPrice: , gas: , value: });
+myContract.deploy({data: bytecode,argument:[uint256,"string",[array1,array2]]}).estimateGas((err,gasAmount)=>{console.log(gasAmount)});
 myContract.deploy({data: bytecode,argument:[uint256,"string",[array1,array2]]}).encodeABI();
 
 myContract.options.data = bytecode;
@@ -254,5 +254,20 @@ myContract.deploy({argument:[uint256,"string",[array1,array2]]});
 //methods
 myContract.methods.Method1().call();
 myContract.methods.Method2(param1,param2).send({from: userAddress1});
+
+
+myContract.methods.Method2(param1,param2).send({from: userAddress1})
+    .on('transactionHash',(hash)=>{
+        console.log(hash);
+    })
+    .on('receipt',(receipt)=>{
+        console.log(hreceiptash);
+    })
+    .on('confirmation',(confirmNum,receipt)=>{
+        console.log(confirmNum);
+    })
+    .on('error',(err)=>{
+        console.log(err);
+    });
 ```
 
