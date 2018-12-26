@@ -87,7 +87,7 @@ batch.execute();
 * `web3.eth.getCode(address [,defaultBlock][,callback])`
     * get the code at specific address
 * `web3.eth.getBlock(blockHash or blockNumber[,returnTxObject][,callback])`
-    * return a Block matching the block number or block hash
+    * return a Block matching the block number or block hasNh
     * `returnTxObject` is boolean ( default is `false`) that decide contain all Tx object, if `false` only contain Tx hash.
 * `web3.eth.getBlockTransactionCount(blockHash or blockNumber [,callback])`
     * return num of tx in given block
@@ -145,7 +145,7 @@ batch.execute();
         ```
 
 * `web3.eth.sendSignedTransaction(signedTransactionData [,callback])`
-    * send an already signed transaction 由`web3.eth.account.signTransaction` sign 
+    * send an already signed transaction 由`web3.eth.account.signTransaction` signed
     * `signedTransactionData` is `string` in HEX format 
 * `web3.eth.sign(dataToSign, address [,callback])`
     * first parameter can be `string` or hex string, cause both valid 
@@ -163,8 +163,8 @@ batch.execute();
 * `web3.eth.getPastLogs(option [,callback])`
     * 透過`option`指定範圍，回傳過去的log
     * `option` is a filter as sturcutre
-        * `fromBlock`
-        * `toBlock`
+        * `fromBlock` can be `string` ("pending" and "latest") or `number`
+        * `toBlock` same above
         * `address` can be `string` or `array`, get log from particular account 
         * `topics` can be `array`
 * `web3.eth.getWork()`
@@ -271,3 +271,90 @@ myContract.methods.Method2(param1,param2).send({from: userAddress1})
     });
 ```
 
+
+## web3.eth.net / web3.shh.net / web3.bzz.net
+This practice will use eth as a example
+* `web3.eth.net.getId()`
+* `web3.eth.net.isListening()`
+* `web3.eth.net.getPeerCount()`
+* `web3.eth.net.getNetworkType()`
+
+
+## web3.eth.accounts
+* `web3.eth.accounts.create(randomString)`
+    * this will generate prikey and pubkey. It's different from `web3.eth.personal.newAccount` which create account via RPC call
+    * `randomString` is optional. random String can increase entropy and be at least 32 characters. if none given random string will generate randomhex
+    * return account object
+        ```javascript
+            {
+                address: ,
+                privateKey:,
+                signTransaction: function(tx){...},
+                sign: function(data){...},
+                encrypt: function(password){...}
+            }
+        ```
+
+* `web3.eth.accounts.privateKeyToAccount(privateKey)`
+    * `privateKey` is string that need to be hex and beginning with `0x`
+* `web3.eth.accounts.signTransaction(tx, privateKey [,callback])`
+    * `tx` object as following
+        ```javascript
+            {
+                nonce: , /*default is web.eth.getTransactionCount*/
+                chainId: ,/*default is web3.eth.net.getId*/
+                to: , /*can be empty for deploy contract*/
+                data: , /*can be empty for simple value transfer */
+                value: ,
+                gasPrice: ,
+                gas: 
+            }
+        ```
+    * return object with RLP encoded transaction 
+        ```javascript
+            {messageHash:, /*given message hash */
+            r:, /* first 32 bytes string*/
+            s:, /* next 32 bytes string*/
+            v:, /* recovery value + 27*/
+            rawTransaction: /* RLP encoded transaction, can be send using web3.eth.sendSignedTransaction*/
+        ```
+
+* `web3.eth.accounts.recoverTransaction(rawTransaction)`
+    * recover account address which was used to sign RLP encoded transaction 
+* `web3.eth.accounts.hashMessage(message)`
+    ```javascript
+        web3.eth.accounts.hashMessage(message); //
+    ```
+* `web3.eth.accounts.sign(data, privateKey)`
+* `web3.eth.accounts.recover()`
+    * recover account address which was signed given data 
+    * parameter can be `(signatureObject)`、`(data,rawTransaction)`、`(data, v, r, s)`
+    * `signatureObject` structure as following
+        ```javascript
+            {
+                messageHash:,
+                r:,
+                s:,
+                v:
+            }
+        ```
+* `web3.eth.accounts.encrypt(privateKey,password)`
+    * encrypt private key to web3 keystore v3 standard
+    * return keystore v3 JSON
+* `web3.eth.accounts.decrypt(keyStoreJsonV3,password)`
+    * decrypt keystore v3 JSON, and create account
+    * return decrypted account
+* `web3.eth.accounts.wallet`
+    * contain multiple account in memory wallet, can be used by `web3.eth.sendTransaction()`
+* `web3.eth.accounts.wallet.create(numOfAccount)`
+* `web3.eth.accounts.wallet.add(accountAddress)`
+* `web3.eth.accounts.wallet.remove(accountAddress)`
+* `web3.eth.accounts.wallet.clear()`
+* `web3.eth.accounts.wallet.encrypt(password)`
+    * encrypt all account of wallet to array of encrypted keystore v3 standard  
+* `web3.eth.accounts.wallet.decrypt(keystoreArray, password)`
+    * decrypt keystore v3 object 
+
+
+    
+## web3.eth.personal 
