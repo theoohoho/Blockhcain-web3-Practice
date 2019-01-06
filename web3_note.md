@@ -196,7 +196,14 @@ This function is subscribing specific event in the blockchain 只訂閱特定在
     * all type return `data`、`changed`、`error`, except 'pendingTransactions' and 'newBlockHeaders' haven't `changed`
 * `web3.eth.clearSubscriptions()`
     * reset subscriptions, but not reset from other packages like `web3-shh`
-
+```javascript
+var subscription = web3.eth.subscribe('logs',{fromBlock:0},function(err,event){console.log(event);});
+    subscription.unsubscribe(function(error, success){
+        console.log(success);
+        if(success)
+            console.log('Successfully unsubscribed!');
+    });
+```
 
 ## web3.eth.Contract
 main function to interact with smart contract in blockchain. When create contract object, first step is give abi json object of respective smart contract and web3 will convert all calls into low level ABI calls over RPC 
@@ -235,9 +242,35 @@ main function to interact with smart contract in blockchain. When create contrac
                 * `estimateGas` estimate gas that method execution will take, but the estimation different from actual gas used, cause the state of smart contract can be different at that time 
                     * `options` include `from`、`gas` as a gasLimit、`value` for call tx 
                 * `encodeABI` enocde abi for this mehtod, can used to send tx, call method, pass to method as argument 
+    * Event
+        * `myContract.once(event [,options] ,callback)` 
+            * subscribe single event
+            * `event` as event name
+            * `options`
+                * `filer` is `object`, can filter event by indexed parameter 
+                * `topics` is `array`, set topics for this events
+        * `myContract.events.eventName([options][,callback])`
+            * subscribe an event
+            * `options` include `filter`、`fromBlock`、`topics`
+            * return eventEmitter
+                * `data`、`changed`、`error`
+                ```javascript
+                    myContract.events.eventName((err,resule)=>{console.log})
+                        .on('data',(event)=>{console.log(event);})
+                        .on('changed',(event)=>{console.log(event);})
+                        .on('error',(event)=>{console.log(event);})
+                ```
+        * `myContract.events.allEvents([options][,callback])`
+            * `options` same as above, but only receive all events from this smart contract 
+        * `myContract.getPastEvents(event [,options] [,callback])`
+            * get past events for this contract 
+            * `event` is `string` as event name
+            * `options` include `filter`、`fromBlock`、`toBlock`、`topics`
+
+
 ```javascript
 // initiate 
-var myContract = new web3.eth.Contract(abi,address);
+var myContract = new web3.eth.Contract(abi);
 
 // clone
 var myContract2 = myContract.clone();
@@ -252,6 +285,7 @@ myContract.options.data = bytecode;
 myContract.deploy({argument:[uint256,"string",[array1,array2]]});
 
 //methods
+var myContract = new web3.eth.Contract(abi,address);
 myContract.methods.Method1().call();
 myContract.methods.Method2(param1,param2).send({from: userAddress1});
 
@@ -269,6 +303,34 @@ myContract.methods.Method2(param1,param2).send({from: userAddress1})
     .on('error',(err)=>{
         console.log(err);
     });
+
+
+// events
+myContract.once('eventName',{
+    filter:{
+        myIndexedParam: [123,234],
+        mySecondIndexedParam: '0x123'
+    }},function(err,event){
+        console.log(event);
+    }
+)
+
+myContract.events.eventName((err,resule)=>{console.log}).on('data',(event)=>{console.log(event)});
+
+myContract.events.allEvents({
+    filter:{
+        myIndexedParam: [123,234]
+    },
+    fromBlock: 123
+},function(){console.log});
+
+myContract.getPastEvents(eventName,{
+    filter:{
+        myIndexedParam: [123,234]
+    },
+    fromBlock: 123,
+    toBlock: 'latest'
+}).then(console.log);
 ```
 
 
@@ -326,6 +388,17 @@ This practice will use eth as a example
         web3.eth.accounts.hashMessage(message); //
     ```
 * `web3.eth.accounts.sign(data, privateKey)`
+    * return
+        ```javascript
+            {
+                message: /*The the given message.*/
+                messageHash: /*The hash of the given message.*/
+                r: /*First 32 bytes of the signature*/
+                s: /*Next 32 bytes of the signature*/
+                v: /*Recovery value + 27*/
+                signature: r+s+v
+            }
+        ```
 * `web3.eth.accounts.recover()`
     * recover account address which was signed given data 
     * parameter can be `(signatureObject)`、`(data,rawTransaction)`、`(data, v, r, s)`
@@ -358,4 +431,21 @@ This practice will use eth as a example
 
     
 ## web3.eth.personal 
- 
+* `web3.eth.personal.newAccount(password[,callback])`
+    * return `string` address
+* `web3.eth.personal.sign(dataToSign, address, password [,callback])`
+    * sign data using specific account
+* `web3.eth.personal.ecRecover(dataThatWasSigned, signature [,callback])`
+    * recover the account that signed the data 
+* `web3.eth.personal.signTransaction(transaction, password [,callback])`
+
+## 特別介紹
+### web3.eth.personal 和 web3.eth.account的差別
+1. `web3.eth.accounts` 運作在local node ，所以可以在local node上 create account、save private key、sign transaction。也因為只能夠在local node 操作，private key不會被傳送到 other node on same blockchain network，像是desktop wallet (ex: Mist、Ethereum wallet) 也因為會暫存 account information 在app folder ，所以account 會自動同步，不需要再log in，除非整個 account information in app folder 被清除
+2. `web3.eth.personal` 則是會 interact with other node，也就代表password 會被送到 other node 一起使用，這也是為什麼`web3.eth.personal.newAccountt`不會產生account object的原因，而且在 web3.personal doc 有特別指名使用personal package 時需要注意provider 是 HTTP or WebSocket
+
+### web3.eth.sign、web3.eth.account.sign、web3.eth.personal.sign差別
+ * No connect node = `web3.eth.accounts.sign(data, privateKey)`
+ * Node with unlocked account  = `web3.eth.sign(txObject, address)`
+ * Node with locked account = `web3.eth.personal.sign(dataToSign, address, password)`
+

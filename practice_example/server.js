@@ -16,99 +16,114 @@ const web3 = new Web3('https://ropsten.infura.io/v3/a18e477ef5054ba7990221817a29
 
 
 // Network Information
-var networkType = ()=>{
-    web3.eth.net.getNetworkType().then((result)=>{
-        console.log(result);
-    })
-}
-
-var getCoinbase = ()=>{
-    web3.eth.getCoinbase((err,result)=>{console.log(result);});
-}
-
-var getGasPrice = ()=>{
-    web3.eth.getGasPrice().then((result)=>{
-        console.log(result);
-    });
-}
-
-var isMining = ()=>{
-    web3.eth.isMining().then((result)=>{
-        console.log(result);
-    });
-}
-
-var getBlockNumber = ()=>{
-    web3.eth.getBlockNumber().then((result)=>{
-        console.log(result);
-    });
-}
-
-var getAccounts = ()=>{
-    web3.eth.getAccounts().then((result)=>{
-        console.log(result);
-    });
-}
-
-var getWork = ()=>{
-    web3.eth.getWork((err,result)=>{console.log(result);});
-}
+var netWorkInformation = {
+    networkType: function(){
+        web3.eth.net.getNetworkType().then((result)=>{
+            console.log(result);
+        });
+    },
+    networkListening: function(){
+        web3.eth.net.isListening().then((result)=>{
+            console.log(result);
+        });
+    },
+    networkPeerCount: function(){
+        web3.eth.net.getPeerCount().then((result)=>{
+            console.log(result);
+        });
+    },
+    networkId: function(){
+        web3.eth.net.getId().then((result)=>{
+            console.log(result);
+        });
+    },
+    getCoinbase: function(){
+        web3.eth.getCoinbase((err,result)=>{console.log(result);});
+    },
+    getGasPrice: function(){
+        web3.eth.getGasPrice().then((result)=>{
+            console.log(result);
+        });
+    },
+    isMining: function(){
+        web3.eth.isMining().then((result)=>{
+            console.log(result);
+        });
+    },
+    getBlockNumber: function(){
+        web3.eth.getBlockNumber().then((result)=>{
+            console.log(result);
+        });
+    },
+    getAccounts: function(){
+        web3.eth.getAccounts().then((result)=>{
+            console.log(result);
+        });
+    },
+    getWork: function(){
+        web3.eth.getWork((err,result)=>{console.log(result);});
+    }
+};
 
 
 
 // Block Status
 // getBlock、subscribe(pendingTransaction、newBlockHeader)
-var getBlock = ()=>{
-    web3.eth.getBlock('latest').then((result)=>{
-        console.log(result);
-    });
+var BlockStatus={
+    getBlock: ()=>{
+        web3.eth.getBlock('latest').then((result)=>{
+            console.log(result);
+        });
+    },
+    getBlockTransactionCount: ()=>{
+        web3.eth.getBlockTransactionCount('latest').then((result)=>{
+            console.log(result);
+        });
+    },
+    getPastLogs: ()=>{
+        web3.eth.getPastLogs({fromBlock:'pending',toBlock:'pending'}).then((result)=>{
+            console.log(result);
+        });
+    },
+    Subscribe: ()=>{
+        web3.eth.subscribe('pendingTransactions',(err,result)=>{
+          if(!err){
+            console.log(result); 
+          }
+        }).on('data',(transaction)=>{
+            console.log(transaction);
+        })
+    }
 }
 
-var getBlockTransactionCount = ()=>{
-    web3.eth.getBlockTransactionCount('latest').then((result)=>{
-        console.log(result);
-    });
-}
-var getPastLogs = ()=>{
-    web3.eth.getPastLogs({fromBlock:'pending',toBlock:'pending'}).then((result)=>{
-        console.log(result);
-    });
-}
-var Subscribe = ()=>{
-    web3.eth.subscribe('pendingTransactions',(err,result)=>{
-      if(!err){
-        console.log(result); 
-      }
-    }).on('data',(transaction)=>{
-        console.log(transaction);
-    })
-}
 
 
 // Address Status
-var getBalance = (address)=>{
-    web3.eth.getBalance(address).then((result)=>{
-        console.log(result);
-    });
+var addressStatus={
+    getBalance: (address)=>{
+        web3.eth.getBalance(address).then((result)=>{
+            console.log(result);
+        });
+    },
+    
+    getTransactionCount: (address)=>{
+        web3.eth.getTransactionCount(address).then((result)=>{
+            console.log(result);
+        });
+    },
+    
+    getCode: (address)=>{
+        web3.eth.getCode(address).then((result)=>{
+            console.log(result);
+        });
+    },
+    getStorageAt: (address)=>{
+        web3.eth.getStorageAt(address).then((result)=>{
+            console.log(result);
+        });
+    }
 }
 
-var getTransactionCount = (address)=>{
-    web3.eth.getTransactionCount(address).then((result)=>{
-        console.log(result);
-    });
-}
-
-var getCode = (address)=>{
-    web3.eth.getCode(address).then((result)=>{
-        console.log(result);
-    });
-}
-
-var getStorageAt = (address)=>{
-    web3.eth.getStorageAt(address).then((result)=>{
-        console.log(result);
-    });
-}
 
 
 
@@ -143,3 +158,13 @@ var hashMessage = (message)=>{
 }
 
 hashMessage("TEST");
+
+// Contract 
+var myContract = new web3.eth.Contract(abi);
+myContract.deploy({data: bytecode,argument:[uint256,"string",[array1,array2]]}).send({from: userAddress, gasPrice: , gas: , value: });
+myContract.deploy({data: bytecode,argument:[uint256,"string",[array1,array2]]}).estimateGas((err,gasAmount)=>{console.log(gasAmount)});
+
+myContract.methods.Method1().call();
+myContract.methods.Method2(param1,param2).send({from: userAddress1});
+
+myContract.once(event [,options] ,callback)
