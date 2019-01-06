@@ -12,7 +12,17 @@ interact with contract  (web3.eth.Contract、myContract.deploy、myContract.meth
 */
 
 const Web3 = require('web3');
-const web3 = new Web3('https://ropsten.infura.io/v3/a18e477ef5054ba7990221817a29e3af');
+if(typeof web3 !== 'undefined'){
+    var web3 = new Web3(web3.currentProvider);
+    console.log('define');
+}
+else{
+    var web3 = new Web3(new Web3.providers.HttpProvider('https://ropsten.infura.io/v3/a18e477ef5054ba7990221817a29e3af'));
+    console.log(web3.eth.net.isListening().then(console.log));
+}
+  
+
+
 
 
 // Network Information
@@ -168,3 +178,4 @@ myContract.methods.Method1().call();
 myContract.methods.Method2(param1,param2).send({from: userAddress1});
 
 myContract.once(event [,options] ,callback)
+

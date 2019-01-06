@@ -1,6 +1,6 @@
 # Web3.js Note
 ## Interduce
-web3 是一個library，可以透過HTTP或IPC和 local端或remote端 的Ethereum Node 進行互動
+web3.js 是一個 Javascript Library，透過Javascript API 呼叫 Ethereum JSON-RPC API ，與local端或remote端 的Ethereum Node 進行互動
 
 * 四種針對Ethereum Ecosystem特定的functionality module
 1. `web3-eth` for Eth Blockchain and Smart contract
@@ -153,7 +153,25 @@ batch.execute();
     * return `string` signature 
 * `web3.eth.signTransaction(txObject, address [,callback])`
     * return object (the RLP econded transaction) 
-    * `raw` property use `web3.eth.sendSignedTransaction` to send tx
+    * `raw` property use `web3.eth.sendSigne dTransaction` to send tx
+    * return 
+        ```javascript
+            {
+            raw: '0x0',
+            tx: {
+                    nonce: '0x...0',
+                    gasPrice: '0x...',
+                    gas: '0x...',
+                    to: '0x...',
+                    value: '0x...',
+                    input: '0x...',
+                    v: '0x...',
+                    r: '0x......',
+                    s: '0x...',
+                    hash: '0x...'
+                } 
+            }
+        ```
 * `web3.eth.call(callObject [,defaultBlock] [,callback])`
     * execute a message call(訊息回傳) transaction ，但是不會被mine進blockchain (也就是說執行不會改變contract內容的 訊息回傳transaction)
     * `callObject`就是txObject，不過`from` property is optional
@@ -374,11 +392,13 @@ This practice will use eth as a example
         ```
     * return object with RLP encoded transaction 
         ```javascript
-            {messageHash:, /*given message hash */
-            r:, /* first 32 bytes string*/
-            s:, /* next 32 bytes string*/
-            v:, /* recovery value + 27*/
-            rawTransaction: /* RLP encoded transaction, can be send using web3.eth.sendSignedTransaction*/
+            {
+                messageHash:, /*given message hash */
+                r:, /* first 32 bytes string*/
+                s:, /* next 32 bytes string*/
+                v:, /* recovery value + 27*/
+                rawTransaction: /* RLP encoded transaction, can be send using web3.eth.sendSignedTransaction*/
+            }
         ```
 
 * `web3.eth.accounts.recoverTransaction(rawTransaction)`
@@ -431,13 +451,21 @@ This practice will use eth as a example
 
     
 ## web3.eth.personal 
-* `web3.eth.personal.newAccount(password[,callback])`
+* `web3.eth.personal.newAccount(password [,callback])`
     * return `string` address
 * `web3.eth.personal.sign(dataToSign, address, password [,callback])`
     * sign data using specific account
+    * return `string` signature
 * `web3.eth.personal.ecRecover(dataThatWasSigned, signature [,callback])`
     * recover the account that signed the data 
 * `web3.eth.personal.signTransaction(transaction, password [,callback])`
+    * sign tx that account need to be unlocked.
+    * return RLP encoded transaction. The `raw` property can be used to sed tx using `web3.eth.sendSignedTransaction`
+* `web3.eth.personal.unlockAccount(address , password , unlockDuration [,callback])`
+    * `unlockDuration` is number for account to remain unlocked
+* `web3.eth.personal.getAccounts()`
+    * return list of accounts that the node controled and call RPC method `personal_listAccounts`. 
+    * using `web3.eth.accounts.create()` will not add accounts into list, instead is `web3.eth.personal.newAccount()`
 
 ## 特別介紹
 ### web3.eth.personal 和 web3.eth.account的差別
@@ -445,7 +473,10 @@ This practice will use eth as a example
 2. `web3.eth.personal` 則是會 interact with other node，也就代表password 會被送到 other node 一起使用，這也是為什麼`web3.eth.personal.newAccountt`不會產生account object的原因，而且在 web3.personal doc 有特別指名使用personal package 時需要注意provider 是 HTTP or WebSocket
 
 ### web3.eth.sign、web3.eth.account.sign、web3.eth.personal.sign差別
- * No connect node = `web3.eth.accounts.sign(data, privateKey)`
- * Node with unlocked account  = `web3.eth.sign(txObject, address)`
- * Node with locked account = `web3.eth.personal.sign(dataToSign, address, password)`
+ * No connect node = `web3.eth.accounts.sign(data, privateKey)` 
+    * is low-level tool, allow you pass in private key directly 
+ * Node with unlocked account  = `web3.eth.sign(txObject, address)` 
+    * can accept address that your node control, only work on unlock account
+ * Node with locked account = `web3.eth.personal.sign(dataToSign, address, password)` 
+    * include address to unlock account, but there is unsecure method that passing password arround in plaintext, that's mean anything can access variable that has your password
 
