@@ -14,6 +14,7 @@ module.exports = (url) => {
         var file = fs.readFileSync(`./${contract}.sol`,'utf8');
         var compiledContract = solc.compile(file);
 
+
         for(var contractName in compiledContract.contracts){
             var abi = compiledContract.contracts[contractName].interface;
             var bytecode = '0x' + compiledContract.contracts[contractName].bytecode;
@@ -22,7 +23,9 @@ module.exports = (url) => {
     }
 
     // fs.writeFileSync()
-
+    this.deploy = (){
+        
+    }
 
 
 
