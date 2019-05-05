@@ -23,9 +23,7 @@ module.exports = (url) => {
     }
 
     // fs.writeFileSync()
-    this.deploy = (){
-        
-    }
+
 
 
 

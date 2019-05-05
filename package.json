@@ -17,11 +17,11 @@
   },
   "homepage": "https://github.com/TheoWei/Blockhcain-web3-Practice#readme",
   "dependencies": {
-    "css-inject": "^1.0.1",
+    "css-inject": "^1.0.2",
     "fs": "0.0.1-security",
-    "morphdom": "^2.3.3",
-    "nanohtml": "^1.4.0",
+    "morphdom": "^2.5.4",
+    "nanohtml": "^1.6.1",
     "solc": "^0.4.25",
-    "web3": "^1.0.0-beta.37"
+    "web3": "^1.0.0-beta.54"
   }
 }
